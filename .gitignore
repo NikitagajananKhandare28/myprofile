@@ -1,0 +1,42 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Android
+android/**/build/
+android/.gradle/
+android/local.properties
+android/**/.cxx/
+*.apk
+*.aab
+*.jks
+*.keystore
+keystore.properties
+
+# Firebase / secrets: NEVER commit these
+android/app/google-services.json
+**/serviceAccountKey*.json
+**/*-firebase-adminsdk-*.json
+.env
+.env.*
+!.env.example
+
+# Backend (Spring Boot / Maven / Gradle)
+backend/target/
+backend/build/
+backend/.gradle/
+backend/src/main/resources/application-local.yml
+
+# Web
+node_modules/
+dist/
+.firebase/
+firebase-debug.log
+
+# Logs
+*.log
