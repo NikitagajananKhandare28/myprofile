@@ -1,4 +1,40 @@
 <resources>
     <string name="app_name">MyProfile</string>
     <string name="tagline">Your digital identity. No website required.</string>
+    <string name="logo_initials">MP</string>
+
+    <string name="welcome_title">Your digital identity, in one link</string>
+    <string name="welcome_subtitle">Create your own digital profile. No website required.</string>
+    <string name="btn_create_profile">Create My Profile</string>
+    <string name="btn_login">Login</string>
+
+    <string name="auth_title_phone">Enter your mobile number</string>
+    <string name="auth_subtitle_phone">We will send a 6-digit code to verify your number.</string>
+    <string name="hint_country_code">Code</string>
+    <string name="hint_mobile">Mobile number</string>
+    <string name="phone_privacy_note">Your number is private by default. It is never shown on your public profile unless you choose to.</string>
+    <string name="btn_send_code">Send code</string>
+
+    <string name="auth_title_otp">Enter the code</string>
+    <string name="otp_sent_to">Code sent to %1$s</string>
+    <string name="hint_otp">6-digit code</string>
+    <string name="btn_verify">Verify</string>
+    <string name="resend_in">Resend code in %1$ds</string>
+    <string name="resend_code">Resend code</string>
+    <string name="btn_change_number">Change number</string>
+
+    <string name="err_invalid_country">Enter a valid country code, for example +91</string>
+    <string name="err_invalid_mobile">Enter a valid mobile number</string>
+    <string name="err_invalid_otp">Enter the 6-digit code</string>
+    <string name="err_incorrect_code">That code is incorrect or has expired</string>
+    <string name="err_invalid_phone_firebase">This phone number is not valid</string>
+    <string name="err_too_many">Too many attempts. Please wait a while and try again.</string>
+    <string name="err_limit_reached">Too many code requests. Please try again later.</string>
+    <string name="err_network">No internet connection. Check your network and try again.</string>
+    <string name="err_generic">Something went wrong. Please try again.</string>
+
+    <string name="home_title">My Profile</string>
+    <string name="home_placeholder">Your profile builder arrives in the next phase.</string>
+    <string name="home_signed_in">Signed in as %1$s</string>
+    <string name="btn_sign_out">Sign out</string>
 </resources>
