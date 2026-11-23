@@ -13,8 +13,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.myprofile.app.R;
+import com.myprofile.app.data.model.SectionType;
 import com.myprofile.app.data.repository.ProfileRepository;
 import com.myprofile.app.databinding.ActivityHomeBinding;
+import com.myprofile.app.ui.builder.SectionListActivity;
 import com.myprofile.app.ui.profile.CreateProfileActivity;
 import com.myprofile.app.ui.profile.EditProfileActivity;
 import com.myprofile.app.ui.welcome.WelcomeActivity;
@@ -45,6 +47,8 @@ public class HomeActivity extends AppCompatActivity {
             PhoneUtils.maskPhone(user.getPhoneNumber())));
         binding.btnEditProfile.setOnClickListener(v ->
             startActivity(new Intent(this, EditProfileActivity.class)));
+        binding.btnEducation.setOnClickListener(v -> openSection(SectionType.EDUCATION));
+        binding.btnExperience.setOnClickListener(v -> openSection(SectionType.EXPERIENCE));
         binding.btnSignOut.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
             openWelcome();
@@ -57,6 +61,12 @@ public class HomeActivity extends AppCompatActivity {
         if (user != null) {
             loadProfile();
         }
+    }
+
+    private void openSection(SectionType type) {
+        Intent intent = new Intent(this, SectionListActivity.class);
+        intent.putExtra(SectionListActivity.EXTRA_TYPE, type.name());
+        startActivity(intent);
     }
 
     private void loadProfile() {

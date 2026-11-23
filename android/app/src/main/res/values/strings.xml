@@ -70,4 +70,35 @@
     <string name="err_skill_length">A skill can be up to 30 characters</string>
     <string name="err_skill_duplicate">You already added that skill</string>
     <string name="home_completion">Profile completion: %1$d%%</string>
+
+    <string name="section_education">Education</string>
+    <string name="section_experience">Work experience</string>
+    <string name="btn_edit">Edit</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_add_item">Add</string>
+    <string name="btn_save_item">Save</string>
+
+    <string name="hint_qualification">Qualification (for example B.Sc. Computer Science)</string>
+    <string name="hint_institution">Institution</string>
+    <string name="hint_year">Year (for example 2022)</string>
+    <string name="edu_empty">No education added yet. Tap Add to start.</string>
+    <string name="edu_add">Add education</string>
+    <string name="edu_edit">Edit education</string>
+
+    <string name="hint_role">Role</string>
+    <string name="hint_organization">Organization</string>
+    <string name="hint_duration">Duration (for example Jun 2023 - Present)</string>
+    <string name="hint_description">Description (optional)</string>
+    <string name="exp_empty">No work experience added yet. Tap Add to start.</string>
+    <string name="exp_add">Add work experience</string>
+    <string name="exp_edit">Edit work experience</string>
+
+    <string name="err_field_required">This field is required (at least 2 characters)</string>
+    <string name="err_too_long">Maximum %1$d characters</string>
+    <string name="err_item_limit">You can add up to 20 entries here</string>
+    <string name="msg_item_saved">Saved</string>
+    <string name="msg_item_deleted">Deleted</string>
+    <string name="delete_confirm_title">Delete this entry?</string>
+    <string name="delete_confirm_message">This cannot be undone.</string>
 </resources>
+

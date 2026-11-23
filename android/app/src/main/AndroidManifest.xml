@@ -49,6 +49,9 @@
             android:name=".ui.profile.EditProfileActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.builder.SectionListActivity"
+            android:exported="false" />
 
     </application>
 
