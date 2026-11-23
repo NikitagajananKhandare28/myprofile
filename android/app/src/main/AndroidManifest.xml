@@ -55,6 +55,15 @@
             android:name=".ui.builder.SectionListActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.builder.ContactActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.builder.PrivacyActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

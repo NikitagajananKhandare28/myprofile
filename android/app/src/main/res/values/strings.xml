@@ -133,5 +133,28 @@
     <string name="visibility_private">Hidden from public profile</string>
     <string name="err_platform">Choose a platform</string>
     <string name="err_invalid_url">Enter a valid link</string>
+
+    <string name="btn_contact">Contact details</string>
+    <string name="btn_privacy">Privacy settings</string>
+
+    <string name="contact_title">Contact details</string>
+    <string name="contact_subtitle">Choose what visitors can see. Everything stays hidden until you switch it on and publish your profile.</string>
+    <string name="hint_phone">Phone number (with country code)</string>
+    <string name="hint_whatsapp">WhatsApp number (with country code)</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_location">Area or landmark (not your exact address)</string>
+    <string name="contact_minor_note">Because you are under 18, your contact details stay hidden from your public profile.</string>
+    <string name="err_invalid_phone">Use 7 to 15 digits, with an optional + at the start</string>
+    <string name="err_invalid_email">Enter a valid email address</string>
+
+    <string name="privacy_title">Privacy settings</string>
+    <string name="privacy_subtitle">Hidden sections never appear on your public profile. The mobile number you used to log in is never shown.</string>
+    <string name="priv_city">Show my city</string>
+    <string name="priv_about">Show About me</string>
+    <string name="priv_skills">Show Skills</string>
+    <string name="priv_education">Show Education</string>
+    <string name="priv_experience">Show Work experience</string>
+    <string name="priv_services">Show Services</string>
+    <string name="priv_achievements">Show Achievements</string>
 </resources>
 

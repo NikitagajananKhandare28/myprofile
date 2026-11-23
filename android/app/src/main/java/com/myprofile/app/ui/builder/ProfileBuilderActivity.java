@@ -15,16 +15,20 @@ public class ProfileBuilderActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActivityProfileBuilderBinding binding =
-            ActivityProfileBuilderBinding.inflate(getLayoutInflater());
+                ActivityProfileBuilderBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         binding.btnAbout.setOnClickListener(v ->
-            startActivity(new Intent(this, EditProfileActivity.class)));
+                startActivity(new Intent(this, EditProfileActivity.class)));
         binding.btnEducation.setOnClickListener(v -> open(SectionType.EDUCATION));
         binding.btnExperience.setOnClickListener(v -> open(SectionType.EXPERIENCE));
         binding.btnServices.setOnClickListener(v -> open(SectionType.SERVICES));
         binding.btnAchievements.setOnClickListener(v -> open(SectionType.ACHIEVEMENTS));
         binding.btnSocial.setOnClickListener(v -> open(SectionType.SOCIAL_LINKS));
+        binding.btnContact.setOnClickListener(v ->
+                startActivity(new Intent(this, ContactActivity.class)));
+        binding.btnPrivacy.setOnClickListener(v ->
+                startActivity(new Intent(this, PrivacyActivity.class)));
     }
 
     private void open(SectionType type) {
