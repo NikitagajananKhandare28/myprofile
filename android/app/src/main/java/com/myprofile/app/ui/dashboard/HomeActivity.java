@@ -13,12 +13,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.myprofile.app.R;
-import com.myprofile.app.data.model.SectionType;
 import com.myprofile.app.data.repository.ProfileRepository;
 import com.myprofile.app.databinding.ActivityHomeBinding;
-import com.myprofile.app.ui.builder.SectionListActivity;
+import com.myprofile.app.ui.builder.ProfileBuilderActivity;
 import com.myprofile.app.ui.profile.CreateProfileActivity;
-import com.myprofile.app.ui.profile.EditProfileActivity;
 import com.myprofile.app.ui.welcome.WelcomeActivity;
 import com.myprofile.app.util.PhoneUtils;
 import com.myprofile.app.util.ProfileCompletion;
@@ -44,11 +42,9 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         binding.tvSignedIn.setText(getString(R.string.home_signed_in,
-            PhoneUtils.maskPhone(user.getPhoneNumber())));
-        binding.btnEditProfile.setOnClickListener(v ->
-            startActivity(new Intent(this, EditProfileActivity.class)));
-        binding.btnEducation.setOnClickListener(v -> openSection(SectionType.EDUCATION));
-        binding.btnExperience.setOnClickListener(v -> openSection(SectionType.EXPERIENCE));
+                PhoneUtils.maskPhone(user.getPhoneNumber())));
+        binding.btnBuilder.setOnClickListener(v ->
+                startActivity(new Intent(this, ProfileBuilderActivity.class)));
         binding.btnSignOut.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
             openWelcome();
@@ -63,12 +59,6 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    private void openSection(SectionType type) {
-        Intent intent = new Intent(this, SectionListActivity.class);
-        intent.putExtra(SectionListActivity.EXTRA_TYPE, type.name());
-        startActivity(intent);
-    }
-
     private void loadProfile() {
         binding.progress.setVisibility(View.VISIBLE);
 
@@ -79,7 +69,7 @@ public class HomeActivity extends AppCompatActivity {
                 if (snapshot == null || !snapshot.exists()) {
                     Intent intent = new Intent(HomeActivity.this, CreateProfileActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                        | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
                     return;
@@ -98,8 +88,8 @@ public class HomeActivity extends AppCompatActivity {
                 binding.progress.setVisibility(View.GONE);
                 binding.content.setVisibility(View.VISIBLE);
                 Snackbar.make(binding.getRoot(), R.string.err_load, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(R.string.btn_retry, v -> loadProfile())
-                    .show();
+                        .setAction(R.string.btn_retry, v -> loadProfile())
+                        .show();
             }
         });
     }

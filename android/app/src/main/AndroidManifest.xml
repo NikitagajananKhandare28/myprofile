@@ -36,10 +36,7 @@
         <activity
             android:name=".ui.dashboard.HomeActivity"
             android:exported="false" />
-        <activity
-            android:name=".ui.profile.EditProfileActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".ui.profile.CreateProfileActivity"
             android:exported="false"
@@ -49,6 +46,11 @@
             android:name=".ui.profile.EditProfileActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.builder.ProfileBuilderActivity"
+            android:exported="false" />
+
         <activity
             android:name=".ui.builder.SectionListActivity"
             android:exported="false" />

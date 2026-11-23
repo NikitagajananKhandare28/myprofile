@@ -88,32 +88,12 @@
                 android:textSize="14sp" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnEditProfile"
+                android:id="@+id/btnBuilder"
                 android:layout_width="wrap_content"
                 android:layout_height="56dp"
                 android:layout_marginTop="28dp"
                 android:minWidth="220dp"
-                android:text="@string/btn_edit_profile"
-                app:cornerRadius="16dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnEducation"
-                style="@style/Widget.Material3.Button.TonalButton"
-                android:layout_width="wrap_content"
-                android:layout_height="56dp"
-                android:layout_marginTop="12dp"
-                android:minWidth="220dp"
-                android:text="@string/section_education"
-                app:cornerRadius="16dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnExperience"
-                style="@style/Widget.Material3.Button.TonalButton"
-                android:layout_width="wrap_content"
-                android:layout_height="56dp"
-                android:layout_marginTop="12dp"
-                android:minWidth="220dp"
-                android:text="@string/section_experience"
+                android:text="@string/btn_profile_builder"
                 app:cornerRadius="16dp" />
 
             <com.google.android.material.button.MaterialButton

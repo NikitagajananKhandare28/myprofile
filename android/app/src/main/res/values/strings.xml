@@ -100,5 +100,38 @@
     <string name="msg_item_deleted">Deleted</string>
     <string name="delete_confirm_title">Delete this entry?</string>
     <string name="delete_confirm_message">This cannot be undone.</string>
+
+    <string name="btn_profile_builder">Profile builder</string>
+    <string name="builder_title">Profile builder</string>
+    <string name="builder_subtitle">Add the sections you want. Nothing is public until you publish your profile.</string>
+    <string name="builder_about">About me and skills</string>
+
+    <string name="section_services">Services</string>
+    <string name="section_achievements">Achievements</string>
+    <string name="section_social">Social links</string>
+
+    <string name="hint_service_name">Service name</string>
+    <string name="hint_price">Price (optional, for example Rs 500 per hour)</string>
+    <string name="srv_empty">No services added yet. Tap Add to start.</string>
+    <string name="srv_add">Add service</string>
+    <string name="srv_edit">Edit service</string>
+
+    <string name="hint_achievement_title">Achievement title</string>
+    <string name="hint_achievement_date">Date (for example March 2024)</string>
+    <string name="ach_empty">No achievements added yet. Tap Add to start.</string>
+    <string name="ach_add">Add achievement</string>
+    <string name="ach_edit">Edit achievement</string>
+
+    <string name="hint_platform">Platform</string>
+    <string name="hint_url">Link (for example instagram.com/yourname)</string>
+    <string name="soc_empty">No social links added yet. Tap Add to start.</string>
+    <string name="soc_add">Add social link</string>
+    <string name="soc_edit">Edit social link</string>
+
+    <string name="cb_public">Show on my public profile</string>
+    <string name="visibility_public">Visible on public profile</string>
+    <string name="visibility_private">Hidden from public profile</string>
+    <string name="err_platform">Choose a platform</string>
+    <string name="err_invalid_url">Enter a valid link</string>
 </resources>
 

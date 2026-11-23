@@ -3,10 +3,12 @@ package com.myprofile.app.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.myprofile.app.R;
 import com.myprofile.app.data.model.SectionItem;
 import com.myprofile.app.databinding.ItemSectionBinding;
 
@@ -38,7 +40,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.Holder> 
     @Override
     public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ItemSectionBinding binding = ItemSectionBinding.inflate(
-            LayoutInflater.from(parent.getContext()), parent, false);
+                LayoutInflater.from(parent.getContext()), parent, false);
         return new Holder(binding);
     }
 
@@ -48,9 +50,17 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.Holder> 
         ItemSectionBinding b = holder.binding;
 
         b.tvTitle.setText(item.getTitle());
-        b.tvSubtitle.setText(item.getSubtitle());
+        setOptional(b.tvSubtitle, item.getSubtitle());
         setOptional(b.tvPeriod, item.getPeriod());
         setOptional(b.tvDescription, item.getDescription());
+
+        if (item.getVisibility().isEmpty()) {
+            b.tvVisibility.setVisibility(View.GONE);
+        } else {
+            b.tvVisibility.setText(item.isPublic()
+                    ? R.string.visibility_public : R.string.visibility_private);
+            b.tvVisibility.setVisibility(View.VISIBLE);
+        }
 
         b.btnEdit.setOnClickListener(v -> listener.onEdit(item));
         b.btnDelete.setOnClickListener(v -> listener.onDelete(item));
@@ -61,7 +71,7 @@ public class SectionAdapter extends RecyclerView.Adapter<SectionAdapter.Holder> 
         return items.size();
     }
 
-    private void setOptional(android.widget.TextView view, String text) {
+    private void setOptional(TextView view, String text) {
         if (text == null || text.isEmpty()) {
             view.setVisibility(View.GONE);
         } else {

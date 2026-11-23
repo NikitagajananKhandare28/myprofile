@@ -7,6 +7,8 @@
         <item name="colorOnPrimaryContainer">@color/navy_900</item>
         <item name="colorSecondary">@color/navy_700</item>
         <item name="colorOnSecondary">@color/surface</item>
+        <item name="colorSecondaryContainer">@color/blue_100</item>
+        <item name="colorOnSecondaryContainer">@color/navy_900</item>
         <item name="colorSurface">@color/surface</item>
         <item name="colorOnSurface">@color/text_primary</item>
         <item name="colorOnSurfaceVariant">@color/text_secondary</item>
