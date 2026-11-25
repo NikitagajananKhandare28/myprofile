@@ -92,8 +92,39 @@
                 android:layout_width="wrap_content"
                 android:layout_height="56dp"
                 android:layout_marginTop="28dp"
-                android:minWidth="220dp"
+                android:minWidth="240dp"
                 android:text="@string/btn_profile_builder"
+                app:cornerRadius="16dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPreview"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:layout_marginTop="12dp"
+                android:minWidth="240dp"
+                android:text="@string/btn_preview"
+                app:cornerRadius="16dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPublish"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:layout_marginTop="12dp"
+                android:minWidth="240dp"
+                android:text="@string/btn_publish_share"
+                app:cornerRadius="16dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnShare"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:layout_marginTop="12dp"
+                android:minWidth="240dp"
+                android:text="@string/btn_share_profile"
+                android:visibility="gone"
                 app:cornerRadius="16dp" />
 
             <com.google.android.material.button.MaterialButton
@@ -102,9 +133,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="56dp"
                 android:layout_marginTop="12dp"
-                android:minWidth="220dp"
+                android:minWidth="240dp"
                 android:text="@string/btn_sign_out"
                 app:cornerRadius="16dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDeleteAccount"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/btn_delete_account"
+                android:textColor="@color/error" />
         </LinearLayout>
     </ScrollView>
 </FrameLayout>
