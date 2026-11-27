@@ -43,3 +43,6 @@ firebase-debug.log
 
 admin-scripts/serviceAccountKey.json
 admin-scripts/*.json
+backup_*/
+*.bak
+*.backup
