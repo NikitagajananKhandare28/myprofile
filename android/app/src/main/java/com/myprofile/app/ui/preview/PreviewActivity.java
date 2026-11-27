@@ -4,7 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -65,6 +68,7 @@ public class PreviewActivity extends AppCompatActivity {
         binding.container.removeAllViews();
 
         addText(getString(R.string.preview_note), 13, false, R.color.text_secondary, 0);
+        addImage(str(s.get("photoUrl")), 120, 12, true);
         addText(str(s.get("displayName")), 28, true, R.color.navy_900, 16);
         addText(str(s.get("profileType")), 16, false, R.color.blue_600, 2);
         if (!str(s.get("city")).isEmpty()) {
@@ -101,6 +105,20 @@ public class PreviewActivity extends AppCompatActivity {
                 "title", null, "date", "description");
         entries(R.string.section_social, s.get("socialLinks"),
                 "platform", "url", null, null);
+
+        Object gallery = s.get("gallery");
+        if (gallery instanceof List && !((List<?>) gallery).isEmpty()) {
+            heading(R.string.gallery_label);
+            for (Object g : (List<?>) gallery) {
+                if (g instanceof Map) {
+                    Map<?, ?> item = (Map<?, ?>) g;
+                    addImage(str(item.get("url")), 200, 12, false);
+                    if (!str(item.get("caption")).isEmpty()) {
+                        addText(str(item.get("caption")), 13, false, R.color.text_secondary, 4);
+                    }
+                }
+            }
+        }
 
         Object contact = s.get("contact");
         if (contact instanceof Map) {
@@ -143,6 +161,22 @@ public class PreviewActivity extends AppCompatActivity {
                 addText(str(item.get(descKey)), 14, false, R.color.text_secondary, 4);
             }
         }
+    }
+
+    private void addImage(String url, int heightDp, int topDp, boolean square) {
+        if (url == null || url.isEmpty()) {
+            return;
+        }
+        float d = getResources().getDisplayMetrics().density;
+        ImageView iv = new ImageView(this);
+        iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        iv.setBackgroundResource(R.drawable.bg_logo);
+        android.widget.LinearLayout.LayoutParams lp = new android.widget.LinearLayout.LayoutParams(
+                square ? (int) (heightDp * d) : android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                (int) (heightDp * d));
+        lp.topMargin = (int) (topDp * d);
+        binding.container.addView(iv, lp);
+        Glide.with(this).load(url).centerCrop().into(iv);
     }
 
     private void heading(int stringRes) {

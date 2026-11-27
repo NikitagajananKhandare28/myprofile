@@ -1,0 +1,23 @@
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+
+spring:
+  application:
+    name: myprofile-backend
+  jackson:
+    default-property-inclusion: non_null
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+myprofile:
+  firebase:
+    project-id: ${FIREBASE_PROJECT_ID:myprofile-app-4caf7}
+    storage-bucket: ${FIREBASE_STORAGE_BUCKET:myprofile-app-4caf7.firebasestorage.app}
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:5173,https://myprofile-app-4caf7.web.app}
+  public-base-url: ${PUBLIC_BASE_URL:https://myprofile-app-4caf7.web.app}

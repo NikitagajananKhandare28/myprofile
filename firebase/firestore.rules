@@ -1,0 +1,404 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() && request.auth.token.admin == true;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function profileExists(uid) {
+      return exists(/databases/$(database)/documents/profiles/$(uid));
+    }
+
+    function isMinorUser(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data.isMinor == true;
+    }
+
+    function validUsername(n) {
+      return n is string
+        && n.matches('^[a-z0-9][a-z0-9-]{2,29}$')
+        && !(n in ['admin', 'api', 'app', 'login', 'privacy', 'terms',
+                   'delete-account', 'help', 'support', 'settings', 'www', 'myprofile']);
+    }
+
+    function strOk(d, key, max) {
+      return !(key in d) || (d[key] is string && d[key].size() <= max);
+    }
+
+    function listOk(d, key, max) {
+      return !(key in d) || (d[key] is list && d[key].size() <= max);
+    }
+
+    function validProfileType(t) {
+      return t in [
+        'Personal', 'Student', 'Sportsperson', 'Teacher / Tutor',
+        'Professional', 'Business', 'Freelancer / Creator',
+        'Service Provider', 'Artist / Other'
+      ];
+    }
+
+    function validProfileFields(d) {
+      return d.displayName is string
+        && d.displayName.size() >= 2 && d.displayName.size() <= 60
+        && d.profileType is string && validProfileType(d.profileType)
+        && d.city is string && d.city.size() <= 60
+        && d.bio is string && d.bio.size() <= 300
+        && d.get('aboutMe', '') is string && d.get('aboutMe', '').size() <= 1000
+        && d.get('skills', []) is list && d.get('skills', []).size() <= 20
+        && d.get('username', '') is string && d.get('username', '').size() <= 30
+        && (!('photoUrl' in d) || (d.photoUrl is string && d.photoUrl.size() <= 600 && d.photoUrl.matches('https://firebasestorage[.]googleapis[.]com/.*')))
+        && d.schemaVersion is int;
+    }
+
+    function validStatusChange(prev, d, uid) {
+      return (d.status == prev.status
+          || (prev.status != 'suspended' && d.status in ['draft', 'published', 'unpublished']))
+        && (prev.get('username', '') == '' || d.get('username', '') == prev.get('username', ''))
+        && (d.status != 'published'
+            || (d.get('username', '') != ''
+                && get(/databases/$(database)/documents/usernames/$(d.username)).data.uid == uid));
+    }
+
+    function validEducation(d) {
+      return d.keys().hasOnly(['qualification', 'institution', 'year', 'createdAt', 'updatedAt'])
+        && d.qualification is string
+        && d.qualification.size() >= 2 && d.qualification.size() <= 100
+        && d.institution is string
+        && d.institution.size() >= 2 && d.institution.size() <= 100
+        && d.year is string && d.year.size() <= 20;
+    }
+
+    function validExperience(d) {
+      return d.keys().hasOnly(['role', 'organization', 'duration', 'description', 'createdAt', 'updatedAt'])
+        && d.role is string
+        && d.role.size() >= 2 && d.role.size() <= 100
+        && d.organization is string
+        && d.organization.size() >= 2 && d.organization.size() <= 100
+        && d.duration is string && d.duration.size() <= 40
+        && d.description is string && d.description.size() <= 500;
+    }
+
+    function validService(d) {
+      return d.keys().hasOnly(['name', 'price', 'description', 'createdAt', 'updatedAt'])
+        && d.name is string
+        && d.name.size() >= 2 && d.name.size() <= 100
+        && d.price is string && d.price.size() <= 40
+        && d.description is string && d.description.size() <= 500;
+    }
+
+    function validAchievement(d) {
+      return d.keys().hasOnly(['title', 'date', 'description', 'createdAt', 'updatedAt'])
+        && d.title is string
+        && d.title.size() >= 2 && d.title.size() <= 100
+        && d.date is string && d.date.size() <= 30
+        && d.description is string && d.description.size() <= 500;
+    }
+
+    function validSocialLink(d) {
+      return d.keys().hasOnly(['platform', 'url', 'visibility', 'createdAt', 'updatedAt'])
+        && d.platform in [
+          'Instagram', 'YouTube', 'Facebook', 'LinkedIn',
+          'Twitter / X', 'GitHub', 'Website', 'Other'
+        ]
+        && d.url is string && d.url.size() <= 300
+        && d.url.matches('https://.+')
+        && d.visibility in ['public', 'private'];
+    }
+
+    function validContact(d, uid) {
+      return d.keys().hasOnly([
+          'phone', 'phoneVisibility', 'whatsapp', 'whatsappVisibility',
+          'email', 'emailVisibility', 'location', 'locationVisibility', 'updatedAt'
+        ])
+        && d.phone is string
+        && (d.phone == '' || d.phone.matches('^[+]?[0-9]{7,15}$'))
+        && d.whatsapp is string
+        && (d.whatsapp == '' || d.whatsapp.matches('^[+]?[0-9]{7,15}$'))
+        && d.email is string && d.email.size() <= 100
+        && (d.email == '' || d.email.matches('^[^@ ]+@[^@ ]+[.][^@ ]+$'))
+        && d.location is string && d.location.size() <= 100
+        && d.phoneVisibility in ['public', 'private']
+        && d.whatsappVisibility in ['public', 'private']
+        && d.emailVisibility in ['public', 'private']
+        && d.locationVisibility in ['public', 'private']
+        && (!isMinorUser(uid)
+            || (d.phoneVisibility == 'private'
+                && d.whatsappVisibility == 'private'
+                && d.emailVisibility == 'private'
+                && d.locationVisibility == 'private'));
+    }
+
+    function validPrivacy(d) {
+      return d.keys().hasOnly([
+          'cityVisibility', 'aboutVisibility', 'skillsVisibility',
+          'educationVisibility', 'experienceVisibility',
+          'servicesVisibility', 'achievementsVisibility', 'updatedAt'
+        ])
+        && d.cityVisibility in ['public', 'private']
+        && d.aboutVisibility in ['public', 'private']
+        && d.skillsVisibility in ['public', 'private']
+        && d.educationVisibility in ['public', 'private']
+        && d.experienceVisibility in ['public', 'private']
+        && d.servicesVisibility in ['public', 'private']
+        && d.achievementsVisibility in ['public', 'private'];
+    }
+
+    function validPublic(d, name, uid) {
+      return d.keys().hasOnly([
+          'ownerUid', 'username', 'displayName', 'profileType', 'bio', 'city',
+          'aboutMe', 'skills', 'education', 'experience', 'services',
+          'achievements', 'socialLinks', 'contact', 'photoUrl', 'gallery', 'updatedAt'
+        ])
+        && d.ownerUid == uid
+        && d.username == name
+        && d.displayName is string
+        && d.displayName.size() >= 2 && d.displayName.size() <= 60
+        && d.profileType is string && validProfileType(d.profileType)
+        && strOk(d, 'bio', 300)
+        && strOk(d, 'city', 60)
+        && strOk(d, 'aboutMe', 1000)
+        && listOk(d, 'skills', 20)
+        && listOk(d, 'education', 20)
+        && listOk(d, 'experience', 20)
+        && listOk(d, 'services', 20)
+        && listOk(d, 'achievements', 20)
+        && listOk(d, 'socialLinks', 20)
+        && listOk(d, 'gallery', 12)
+        && (!('photoUrl' in d) || (d.photoUrl is string && d.photoUrl.matches('https://firebasestorage[.]googleapis[.]com/.*')))
+        && (!('contact' in d) || d.contact is map)
+        && (!isMinorUser(uid) || !('contact' in d))
+        && get(/databases/$(database)/documents/usernames/$(name)).data.uid == uid
+        && get(/databases/$(database)/documents/profiles/$(uid)).data.status != 'suspended';
+    }
+
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+
+      allow create: if isOwner(uid)
+        && request.resource.data.keys().hasOnly([
+          'uid', 'mobileE164', 'status', 'isMinor', 'guardianConsent',
+          'consentVersion', 'createdAt', 'lastLoginAt'
+        ])
+        && request.resource.data.uid == uid
+        && request.resource.data.mobileE164 == request.auth.token.phone_number
+        && request.resource.data.status == 'active'
+        && request.resource.data.isMinor is bool
+        && request.resource.data.guardianConsent is bool
+        && (!request.resource.data.isMinor
+            || request.resource.data.guardianConsent == true)
+        && request.resource.data.consentVersion is string
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.lastLoginAt == request.time;
+
+      allow update: if isOwner(uid)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastLoginAt'])
+        && request.resource.data.lastLoginAt == request.time;
+
+      allow delete: if isOwner(uid);
+    }
+
+    match /profiles/{uid} {
+      allow read: if isAdmin();
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
+        && request.resource.data.status in ['suspended', 'unpublished']
+        && request.resource.data.updatedAt == request.time;
+      allow read: if isOwner(uid);
+
+      allow create: if isOwner(uid)
+        && request.resource.data.keys().hasOnly([
+          'ownerUid', 'displayName', 'profileType', 'city', 'bio',
+          'aboutMe', 'skills',
+          'status', 'schemaVersion', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.ownerUid == uid
+        && request.resource.data.status == 'draft'
+        && validProfileFields(request.resource.data)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+
+      allow update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly([
+          'ownerUid', 'displayName', 'profileType', 'city', 'bio',
+          'aboutMe', 'skills', 'username', 'photoUrl',
+          'status', 'schemaVersion', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.createdAt == resource.data.createdAt
+        && validProfileFields(request.resource.data)
+        && validStatusChange(resource.data, request.resource.data, uid)
+        && request.resource.data.updatedAt == request.time;
+
+      allow delete: if isOwner(uid);
+    }
+
+    match /profiles/{uid}/education/{itemId} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid) && profileExists(uid)
+        && validEducation(request.resource.data)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isOwner(uid)
+        && validEducation(request.resource.data)
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isOwner(uid);
+    }
+
+    match /profiles/{uid}/experience/{itemId} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid) && profileExists(uid)
+        && validExperience(request.resource.data)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isOwner(uid)
+        && validExperience(request.resource.data)
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isOwner(uid);
+    }
+
+    match /profiles/{uid}/services/{itemId} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid) && profileExists(uid)
+        && validService(request.resource.data)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isOwner(uid)
+        && validService(request.resource.data)
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isOwner(uid);
+    }
+
+    match /profiles/{uid}/achievements/{itemId} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid) && profileExists(uid)
+        && validAchievement(request.resource.data)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isOwner(uid)
+        && validAchievement(request.resource.data)
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isOwner(uid);
+    }
+
+    match /profiles/{uid}/socialLinks/{itemId} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid) && profileExists(uid)
+        && validSocialLink(request.resource.data)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isOwner(uid)
+        && validSocialLink(request.resource.data)
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isOwner(uid);
+    }
+
+    match /profiles/{uid}/contact/{docId} {
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid) && docId == 'main' && profileExists(uid)
+        && validContact(request.resource.data, uid)
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isOwner(uid);
+    }
+
+    match /profiles/{uid}/privacy/{docId} {
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid) && docId == 'settings' && profileExists(uid)
+        && validPrivacy(request.resource.data)
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isOwner(uid);
+    }
+
+    function validPhoto(d, uid) {
+      return d.keys().hasOnly(['url', 'path', 'caption', 'createdAt', 'updatedAt'])
+        && d.url is string && d.url.size() <= 600
+        && d.url.matches('https://firebasestorage[.]googleapis[.]com/.*')
+        && d.path is string && d.path.matches('users/' + uid + '/gallery/[A-Za-z0-9-]+[.]jpg')
+        && d.caption is string && d.caption.size() <= 100;
+    }
+
+    match /profiles/{uid}/photos/{photoId} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid) && profileExists(uid)
+        && validPhoto(request.resource.data, uid)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if isOwner(uid)
+        && validPhoto(request.resource.data, uid)
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isOwner(uid);
+    }
+
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['actorUid', 'action', 'target', 'reportId', 'createdAt'])
+        && request.resource.data.actorUid == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+
+    match /usernames/{name} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if signedIn() && validUsername(name)
+        && request.resource.data.keys().hasOnly(['uid', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+      allow update: if false;
+      allow delete: if signedIn()
+        && (resource == null || resource.data.uid == request.auth.uid);
+    }
+
+    match /publicProfiles/{name} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if signedIn() && validUsername(name)
+        && validPublic(request.resource.data, name, request.auth.uid)
+        && request.resource.data.updatedAt == request.time;
+      allow update: if signedIn() && resource.data.ownerUid == request.auth.uid
+        && validPublic(request.resource.data, name, request.auth.uid)
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if signedIn()
+        && (resource == null || resource.data.ownerUid == request.auth.uid || isAdmin());
+    }
+
+    match /reports/{reportId} {
+      allow create: if request.resource.data.keys().hasOnly(
+          ['username', 'reason', 'message', 'status', 'createdAt'])
+        && validUsername(request.resource.data.username)
+        && request.resource.data.reason in [
+          'Fake or impersonation', 'Inappropriate content', 'Spam',
+          'Personal information exposed', 'Other'
+        ]
+        && request.resource.data.message is string
+        && request.resource.data.message.size() <= 300
+        && request.resource.data.status == 'open'
+        && request.resource.data.createdAt == request.time;
+      allow read: if isAdmin();
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'action', 'reviewedBy', 'reviewedAt'])
+        && request.resource.data.status in ['actioned', 'dismissed']
+        && request.resource.data.reviewedBy == request.auth.uid
+        && request.resource.data.reviewedAt == request.time;
+      allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

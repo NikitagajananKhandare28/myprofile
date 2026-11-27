@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.myprofile.app.data.model.SectionType;
 import com.myprofile.app.databinding.ActivityProfileBuilderBinding;
+import com.myprofile.app.ui.photos.PhotosActivity;
 import com.myprofile.app.ui.profile.EditProfileActivity;
 
 public class ProfileBuilderActivity extends AppCompatActivity {
@@ -20,6 +21,8 @@ public class ProfileBuilderActivity extends AppCompatActivity {
 
         binding.btnAbout.setOnClickListener(v ->
                 startActivity(new Intent(this, EditProfileActivity.class)));
+        binding.btnPhotos.setOnClickListener(v ->
+                startActivity(new Intent(this, PhotosActivity.class)));
         binding.btnEducation.setOnClickListener(v -> open(SectionType.EDUCATION));
         binding.btnExperience.setOnClickListener(v -> open(SectionType.EXPERIENCE));
         binding.btnServices.setOnClickListener(v -> open(SectionType.SERVICES));

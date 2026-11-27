@@ -58,3 +58,6 @@ body {
 }
 .report button[type="submit"] { background: var(--navy); color: #fff; border: 0; cursor: pointer; }
 .link-button { background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; font: inherit; }
+.avatar-img { width: 88px; height: 88px; border-radius: 24px; object-fit: cover; display: block; margin: 0 auto; }
+.photo { margin: 12px 0 0; }
+.photo img { width: 100%; border-radius: 12px; display: block; }

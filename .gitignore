@@ -40,3 +40,6 @@ firebase-debug.log
 
 # Logs
 *.log
+
+admin-scripts/serviceAccountKey.json
+admin-scripts/*.json

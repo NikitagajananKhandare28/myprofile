@@ -77,6 +77,10 @@
             android:name=".ui.share.ShareActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.photos.PhotosActivity"
+            android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

@@ -9,6 +9,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +23,11 @@ public class AccountRepository {
     }
 
     private static final String[] SECTIONS = {
-            "education", "experience", "services", "achievements", "socialLinks"
+            "education", "experience", "services", "achievements", "socialLinks", "photos"
     };
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseStorage storage = FirebaseStorage.getInstance();
 
     public void deleteAll(@NonNull String uid, String username,
                           @NonNull ResultCallback callback) {
@@ -39,9 +41,19 @@ public class AccountRepository {
         Tasks.<Object>whenAllSuccess(tasks)
                 .addOnSuccessListener(results -> {
                     WriteBatch batch = db.batch();
-                    for (Object result : results) {
-                        for (DocumentSnapshot d : ((QuerySnapshot) result).getDocuments()) {
+                    List<String> storagePaths = new ArrayList<>();
+                    storagePaths.add("users/" + uid + "/avatar.jpg");
+
+                    for (int i = 0; i < results.size(); i++) {
+                        QuerySnapshot snapshot = (QuerySnapshot) results.get(i);
+                        for (DocumentSnapshot d : snapshot.getDocuments()) {
                             batch.delete(d.getReference());
+                            if (i == SECTIONS.length - 1) {
+                                String path = d.getString("path");
+                                if (path != null && !path.isEmpty()) {
+                                    storagePaths.add(path);
+                                }
+                            }
                         }
                     }
                     batch.delete(profile.collection("contact").document("main"));
@@ -52,10 +64,19 @@ public class AccountRepository {
                     }
                     batch.delete(profile);
                     batch.delete(db.collection("users").document(uid));
+
                     batch.commit()
-                            .addOnSuccessListener(unused -> callback.onSuccess())
+                            .addOnSuccessListener(unused -> deleteFiles(storagePaths, callback))
                             .addOnFailureListener(callback::onError);
                 })
                 .addOnFailureListener(callback::onError);
+    }
+
+    private void deleteFiles(List<String> paths, ResultCallback callback) {
+        List<Task<Void>> deletes = new ArrayList<>();
+        for (String path : paths) {
+            deletes.add(storage.getReference().child(path).delete());
+        }
+        Tasks.whenAllComplete(deletes).addOnCompleteListener(done -> callback.onSuccess());
     }
 }

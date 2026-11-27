@@ -50,6 +50,9 @@ public class PublishRepository {
                     .orderBy("createdAt", Query.Direction.DESCENDING).get());
         }
 
+        tasks.add(profile.collection("photos")
+                .orderBy("createdAt", Query.Direction.DESCENDING).get());
+
         Tasks.<Object>whenAllSuccess(tasks)
                 .addOnSuccessListener(results -> {
                     try {
@@ -116,6 +119,21 @@ public class PublishRepository {
         putIfAny(out, "socialLinks", true,
                 items((QuerySnapshot) r.get(8),
                         new String[]{"platform", "url"}, "visibility"));
+
+        String photoUrl = s(profile.getString("photoUrl"));
+        if (!photoUrl.isEmpty()) {
+            out.put("photoUrl", photoUrl);
+        }
+        List<Map<String, Object>> gallery = new ArrayList<>();
+        for (DocumentSnapshot g : ((QuerySnapshot) r.get(9)).getDocuments()) {
+            Map<String, Object> m = new HashMap<>();
+            m.put("url", s(g.getString("url")));
+            m.put("caption", s(g.getString("caption")));
+            gallery.add(m);
+        }
+        if (!gallery.isEmpty()) {
+            out.put("gallery", gallery);
+        }
 
         if (!minor && contact != null && contact.exists()) {
             Map<String, Object> c = new HashMap<>();

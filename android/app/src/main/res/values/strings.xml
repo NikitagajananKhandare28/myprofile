@@ -200,5 +200,19 @@
     <string name="msg_link_copied">Link copied</string>
     <string name="share_message">Here is my digital profile: %1$s</string>
     <string name="err_whatsapp">WhatsApp is not installed</string>
+
+    <string name="btn_photos">Photos</string>
+    <string name="photos_title">Photos</string>
+    <string name="photos_subtitle">Your profile photo and gallery. Photos are compressed before upload.</string>
+    <string name="btn_change_photo">Change photo</string>
+    <string name="btn_remove_photo">Remove</string>
+    <string name="gallery_label">Gallery</string>
+    <string name="btn_add_gallery">Add photo</string>
+    <string name="hint_caption">Caption (optional)</string>
+    <string name="msg_photo_saved">Photo saved</string>
+    <string name="msg_photo_removed">Photo removed</string>
+    <string name="err_photo">Could not upload the photo. Try a different image.</string>
+    <string name="err_photo_limit">You can add up to 12 photos</string>
+    <string name="photos_empty">No gallery photos yet.</string>
 </resources>
 
