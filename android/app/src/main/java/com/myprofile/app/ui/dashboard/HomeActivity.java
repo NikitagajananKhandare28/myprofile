@@ -16,8 +16,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.FirebaseUserMetadata;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.myprofile.app.R;
-import com.myprofile.app.data.repository.AccountRepository;
+import com.myprofile.app.data.remote.ApiClient;
 import com.myprofile.app.data.repository.ProfileRepository;
+import com.myprofile.app.data.repository.PublishRepository;
+import com.myprofile.app.data.repository.ServerPublishRepository;
 import com.myprofile.app.databinding.ActivityHomeBinding;
 import com.myprofile.app.ui.builder.ProfileBuilderActivity;
 import com.myprofile.app.ui.preview.PreviewActivity;
@@ -28,6 +30,8 @@ import com.myprofile.app.ui.welcome.WelcomeActivity;
 import com.myprofile.app.util.PhoneUtils;
 import com.myprofile.app.util.ProfileCompletion;
 
+import org.json.JSONObject;
+
 public class HomeActivity extends AppCompatActivity {
 
     private static final String TAG = "Home";
@@ -35,9 +39,10 @@ public class HomeActivity extends AppCompatActivity {
 
     private ActivityHomeBinding binding;
     private final ProfileRepository repository = new ProfileRepository();
-    private final AccountRepository accountRepository = new AccountRepository();
+    private ServerPublishRepository serverRepository;
     private FirebaseUser user;
     private String username = "";
+    private boolean pendingSync = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,11 +55,14 @@ public class HomeActivity extends AppCompatActivity {
             openWelcome();
             return;
         }
+        serverRepository = new ServerPublishRepository(this);
 
         binding.tvSignedIn.setText(getString(R.string.home_signed_in,
                 PhoneUtils.maskPhone(user.getPhoneNumber())));
-        binding.btnBuilder.setOnClickListener(v ->
-                startActivity(new Intent(this, ProfileBuilderActivity.class)));
+        binding.btnBuilder.setOnClickListener(v -> {
+            pendingSync = true;
+            startActivity(new Intent(this, ProfileBuilderActivity.class));
+        });
         binding.btnPreview.setOnClickListener(v ->
                 startActivity(new Intent(this, PreviewActivity.class)));
         binding.btnPublish.setOnClickListener(v ->
@@ -112,6 +120,11 @@ public class HomeActivity extends AppCompatActivity {
                     binding.btnShare.setVisibility(View.GONE);
                 }
                 binding.content.setVisibility(View.VISIBLE);
+
+                if (pendingSync && "published".equals(status) && !username.isEmpty()) {
+                    pendingSync = false;
+                    syncPublicPage();
+                }
             }
 
             @Override
@@ -122,6 +135,22 @@ public class HomeActivity extends AppCompatActivity {
                 Snackbar.make(binding.getRoot(), R.string.err_load, Snackbar.LENGTH_INDEFINITE)
                         .setAction(R.string.btn_retry, v -> loadProfile())
                         .show();
+            }
+        });
+    }
+
+    private void syncPublicPage() {
+        Snackbar.make(binding.getRoot(), R.string.sync_updating, Snackbar.LENGTH_SHORT).show();
+        serverRepository.publish(user.getUid(), username, new PublishRepository.ResultCallback() {
+            @Override
+            public void onSuccess() {
+                Snackbar.make(binding.getRoot(), R.string.sync_done, Snackbar.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(@NonNull Exception e) {
+                Log.e(TAG, "Sync failed", e);
+                Snackbar.make(binding.getRoot(), R.string.sync_failed, Snackbar.LENGTH_LONG).show();
             }
         });
     }
@@ -139,33 +168,37 @@ public class HomeActivity extends AppCompatActivity {
         FirebaseUserMetadata meta = user.getMetadata();
         long lastSignIn = meta == null ? 0L : meta.getLastSignInTimestamp();
         if (System.currentTimeMillis() - lastSignIn > RECENT_LOGIN_MS) {
-            Toast.makeText(this, R.string.err_relogin, Toast.LENGTH_LONG).show();
-            FirebaseAuth.getInstance().signOut();
-            openWelcome();
+            askRelogin();
             return;
         }
 
         binding.progress.setVisibility(View.VISIBLE);
-        accountRepository.deleteAll(user.getUid(), username,
-                new AccountRepository.ResultCallback() {
-                    @Override
-                    public void onSuccess() {
-                        user.delete().addOnCompleteListener(task -> {
-                            FirebaseAuth.getInstance().signOut();
-                            Toast.makeText(HomeActivity.this, R.string.msg_account_deleted,
-                                    Toast.LENGTH_LONG).show();
-                            openWelcome();
-                        });
-                    }
+        ApiClient.request(this, "DELETE", "/api/v1/account", null, new ApiClient.Callback() {
+            @Override
+            public void onSuccess(JSONObject body) {
+                FirebaseAuth.getInstance().signOut();
+                Toast.makeText(HomeActivity.this, R.string.msg_account_deleted,
+                        Toast.LENGTH_LONG).show();
+                openWelcome();
+            }
 
-                    @Override
-                    public void onError(@NonNull Exception e) {
-                        Log.e(TAG, "Delete failed", e);
-                        binding.progress.setVisibility(View.GONE);
-                        Snackbar.make(binding.getRoot(), R.string.err_save,
-                                Snackbar.LENGTH_LONG).show();
-                    }
-                });
+            @Override
+            public void onError(int httpStatus, String code, String message) {
+                Log.e(TAG, "Delete failed: " + code);
+                binding.progress.setVisibility(View.GONE);
+                if ("REAUTH_REQUIRED".equals(code)) {
+                    askRelogin();
+                } else {
+                    Snackbar.make(binding.getRoot(), R.string.err_save, Snackbar.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    private void askRelogin() {
+        Toast.makeText(this, R.string.err_relogin, Toast.LENGTH_LONG).show();
+        FirebaseAuth.getInstance().signOut();
+        openWelcome();
     }
 
     private void openWelcome() {

@@ -75,7 +75,7 @@ public class ShareActivity extends AppCompatActivity {
                     binding.tvLink.setText(R.string.share_not_published);
                     return;
                 }
-                link = AppConfig.PUBLIC_BASE_URL + name;
+                link = AppConfig.PUBLIC_BASE_URL + "p/" + name;
                 binding.tvLink.setText(link);
                 try {
                     qr = createQr(link, 800);

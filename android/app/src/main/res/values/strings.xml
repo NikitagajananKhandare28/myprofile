@@ -1,4 +1,4 @@
-<resources>
+﻿<resources>
     <string name="app_name">MyProfile</string>
     <string name="tagline">Your digital identity. No website required.</string>
     <string name="logo_initials">MP</string>
@@ -214,5 +214,9 @@
     <string name="err_photo">Could not upload the photo. Try a different image.</string>
     <string name="err_photo_limit">You can add up to 12 photos</string>
     <string name="photos_empty">No gallery photos yet.</string>
+    <string name="sync_updating">Updating your public page...</string>
+    <string name="sync_done">Your public page is up to date</string>
+    <string name="sync_failed">Could not update your public page. Open Publish and share to retry.</string>
+    <string name="suggested_for">Suggested for %1$s: the buttons marked Suggested.</string>
+    <string name="suggested_tag">Suggested</string>
 </resources>
-

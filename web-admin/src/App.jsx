@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import {
   collection, doc, getCountFromServer, getDoc, getDocs, limit,
   orderBy, query, serverTimestamp, where, writeBatch,
 } from "firebase/firestore";
 import { auth, db } from "./firebase.js";
+import { apiPost } from "./api.js";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -86,6 +87,10 @@ function Dashboard() {
   }
 
   function takeDown(report) {
+    return run(() => apiPost("/api/v1/admin/reports/" + report.id + "/takedown"));
+  }
+
+  function takeDownLegacy(report) {
     return run(async () => {
       const publicRef = doc(db, "publicProfiles", report.username);
       const snap = await getDoc(publicRef);
@@ -115,6 +120,10 @@ function Dashboard() {
   }
 
   function dismiss(report) {
+    return run(() => apiPost("/api/v1/admin/reports/" + report.id + "/dismiss"));
+  }
+
+  function dismissLegacy(report) {
     return run(async () => {
       const batch = writeBatch(db);
       batch.update(doc(db, "reports", report.id), {
@@ -135,6 +144,13 @@ function Dashboard() {
   }
 
   function reinstate() {
+    return run(async () => {
+      await apiPost("/api/v1/admin/profiles/" + name.trim().toLowerCase() + "/reinstate");
+      setName("");
+    });
+  }
+
+  function reinstateLegacy() {
     return run(async () => {
       const clean = name.trim().toLowerCase();
       const claim = await getDoc(doc(db, "usernames", clean));
@@ -239,3 +255,6 @@ export default function App() {
   }
   return <Dashboard />;
 }
+
+
+

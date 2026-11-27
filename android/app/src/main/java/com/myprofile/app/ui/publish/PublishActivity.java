@@ -15,6 +15,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.myprofile.app.R;
 import com.myprofile.app.data.repository.ProfileRepository;
 import com.myprofile.app.data.repository.PublishRepository;
+import com.myprofile.app.data.repository.ServerPublishRepository;
 import com.myprofile.app.databinding.ActivityPublishBinding;
 import com.myprofile.app.ui.preview.PreviewActivity;
 import com.myprofile.app.ui.share.ShareActivity;
@@ -32,6 +33,7 @@ public class PublishActivity extends AppCompatActivity {
     private FirebaseUser user;
     private String savedUsername = "";
     private boolean loaded = false;
+    private ServerPublishRepository serverRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,7 @@ public class PublishActivity extends AppCompatActivity {
             return;
         }
 
+        serverRepository = new ServerPublishRepository(this);
         binding.tilUsername.setPrefixText(AppConfig.PUBLIC_HOST + "/");
         binding.btnPublish.setOnClickListener(v -> onPublishClicked());
         binding.btnUnpublish.setOnClickListener(v -> onUnpublishClicked());
@@ -128,7 +131,7 @@ public class PublishActivity extends AppCompatActivity {
         }
 
         setLoading(true);
-        publishRepository.publish(user.getUid(), username, new PublishRepository.ResultCallback() {
+        serverRepository.publish(user.getUid(), username, new PublishRepository.ResultCallback() {
             @Override
             public void onSuccess() {
                 setLoading(false);
@@ -156,7 +159,7 @@ public class PublishActivity extends AppCompatActivity {
             return;
         }
         setLoading(true);
-        publishRepository.unpublish(user.getUid(), savedUsername,
+        serverRepository.unpublish(user.getUid(), savedUsername,
                 new PublishRepository.ResultCallback() {
                     @Override
                     public void onSuccess() {
@@ -188,3 +191,7 @@ public class PublishActivity extends AppCompatActivity {
         Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
     }
 }
+
+
+
+

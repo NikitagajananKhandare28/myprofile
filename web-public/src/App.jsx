@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { addDoc, collection, doc, getDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "./firebase.js";
 
@@ -56,6 +56,21 @@ function ReportBox({ username }) {
   const [state, setState] = useState("idle");
 
   async function submit(event) {
+    event.preventDefault();
+    setState("sending");
+    try {
+      const res = await fetch("/api/v1/reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, reason, message: message.slice(0, 300) }),
+      });
+      setState(res.ok ? "sent" : "error");
+    } catch (error) {
+      setState("error");
+    }
+  }
+
+  async function submitLegacy(event) {
     event.preventDefault();
     setState("sending");
     try {
@@ -305,10 +320,11 @@ function TermsPage() {
 }
 
 export default function App() {
-  const path = currentPath();
+  const path = currentPath().replace(/^p\//, "");
   if (path === "") return <Landing />;
   if (path === "delete-account") return <DeleteAccountPage />;
   if (path === "privacy") return <PrivacyPage />;
   if (path === "terms") return <TermsPage />;
   return <Profile username={path} />;
 }
+
